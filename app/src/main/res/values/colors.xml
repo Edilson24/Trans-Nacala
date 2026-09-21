@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Cores principais da identidade TransNacala -->
+    <color name="primary">#1976D2</color>
+    <color name="primary_dark">#0D47A1</color>
+    <color name="primary_light">#E3F2FD</color>
+
+    <!-- Fundo -->
+    <color name="background">#F6F9FD</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="card_background">#FFFFFF</color>
+
+    <!-- Textos -->
+    <color name="text_primary">#102A56</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_muted">#94A3B8</color>
+
+    <!-- Elementos -->
+    <color name="divider">#E2E8F0</color>
+    <color name="icon_background">#E8F1FF</color>
+
+    <!-- Tarifa -->
+    <color name="fare_background">#E8F2FF</color>
+    <color name="fare_text">#1976D2</color>
+
+    <!-- Estados -->
+    <color name="success">#22A447</color>
+    <color name="warning">#F59E0B</color>
+    <color name="danger">#DC3545</color>
+
+    <!-- Rotas -->
+    <color name="route_blue">#1976D2</color>
+    <color name="route_green">#22A447</color>
+    <color name="route_orange">#F59E0B</color>
+    <color name="route_purple">#7C3AED</color>
+    <color name="route_teal">#0EA5A8</color>
+
+</resources>
