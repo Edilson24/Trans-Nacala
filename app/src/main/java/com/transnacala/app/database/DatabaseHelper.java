@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "transnacala.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -15,6 +15,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+
+        db.execSQL("PRAGMA foreign_keys = ON");
 
         String tabelaRota = "CREATE TABLE rota (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -49,10 +51,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL("DROP TABLE IF EXISTS rota_paragem");
-        db.execSQL("DROP TABLE IF EXISTS paragem");
-        db.execSQL("DROP TABLE IF EXISTS rota");
+        if (oldVersion < 2) {
 
-        onCreate(db);
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS paragem (" +
+                            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                            "nome TEXT NOT NULL, " +
+                            "latitude REAL NOT NULL, " +
+                            "longitude REAL NOT NULL" +
+                            ")"
+            );
+
+            db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS rota_paragem (" +
+                            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                            "rota_id INTEGER NOT NULL, " +
+                            "paragem_id INTEGER NOT NULL, " +
+                            "ordem INTEGER NOT NULL, " +
+                            "FOREIGN KEY(rota_id) REFERENCES rota(id), " +
+                            "FOREIGN KEY(paragem_id) REFERENCES paragem(id)" +
+                            ")"
+            );
+        }
     }
 }
