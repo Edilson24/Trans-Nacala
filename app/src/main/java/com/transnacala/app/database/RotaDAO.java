@@ -96,4 +96,8 @@ public class RotaDAO {
 
         return rota;
     }
+
+    public DatabaseHelper getDatabaseHelper() {
+        return databaseHelper;
+    }
 }

@@ -17,11 +17,11 @@ public class DatabaseSeeder {
 
         /*
          * ============================================================
-         * 1. GARANTIR QUE AS ROTAS EXISTEM
+         * 1. GARANTIR / ATUALIZAR AS ROTAS
          * ============================================================
          */
 
-        inserirRotaSeNaoExistir(
+        inserirOuAtualizarRota(
                 rotaDAO,
                 new Rota(
                         "Baixa → Alta",
@@ -32,7 +32,7 @@ public class DatabaseSeeder {
                 )
         );
 
-        inserirRotaSeNaoExistir(
+        inserirOuAtualizarRota(
                 rotaDAO,
                 new Rota(
                         "Baixa → Matibane",
@@ -43,18 +43,18 @@ public class DatabaseSeeder {
                 )
         );
 
-        inserirRotaSeNaoExistir(
+        inserirOuAtualizarRota(
                 rotaDAO,
                 new Rota(
-                        "Alta → Fernão Veloso",
-                        "Alta",
+                        "Fernão Veloso → Alta",
                         "Fernão Veloso",
+                        "Alta",
                         15,
-                        "Percurso entre a Alta e Fernão Veloso."
+                        "Percurso entre Fernão Veloso e Alta."
                 )
         );
 
-        inserirRotaSeNaoExistir(
+        inserirOuAtualizarRota(
                 rotaDAO,
                 new Rota(
                         "Fernão Veloso → Juma",
@@ -65,7 +65,7 @@ public class DatabaseSeeder {
                 )
         );
 
-        inserirRotaSeNaoExistir(
+        inserirOuAtualizarRota(
                 rotaDAO,
                 new Rota(
                         "Juma → Nacala-a-Velha",
@@ -83,9 +83,9 @@ public class DatabaseSeeder {
          * ============================================================
          */
 
-        // -------------------------
+        // ------------------------------------------------------------
         // Percurso Fernão Veloso
-        // -------------------------
+        // ------------------------------------------------------------
 
         inserirParagemSeNaoExistir(
                 paragemDAO,
@@ -178,9 +178,9 @@ public class DatabaseSeeder {
         );
 
 
-        // -------------------------
+        // ------------------------------------------------------------
         // Percurso Baixa
-        // -------------------------
+        // ------------------------------------------------------------
 
         inserirParagemSeNaoExistir(
                 paragemDAO,
@@ -290,9 +290,10 @@ public class DatabaseSeeder {
                 )
         );
 
-        // -------------------------
+
+        // ------------------------------------------------------------
         // Juma / Nacala-a-Velha
-        // -------------------------
+        // ------------------------------------------------------------
 
         inserirParagemSeNaoExistir(
                 paragemDAO,
@@ -319,12 +320,10 @@ public class DatabaseSeeder {
          * ============================================================
          */
 
-        /*
-         * ------------------------------------------------------------
-         * ROTA 1
-         * Fernão Veloso → Juma
-         * ------------------------------------------------------------
-         */
+        // ------------------------------------------------------------
+        // ROTA 1
+        // Fernão Veloso → Juma
+        // ------------------------------------------------------------
 
         int rotaFernãoVelosoJuma =
                 buscarIdRota(rotaDAO, "Fernão Veloso → Juma");
@@ -418,12 +417,10 @@ public class DatabaseSeeder {
         );
 
 
-        /*
-         * ------------------------------------------------------------
-         * ROTA 2
-         * Fernão Veloso → Alta
-         * ------------------------------------------------------------
-         */
+        // ------------------------------------------------------------
+        // ROTA 2
+        // Fernão Veloso → Alta
+        // ------------------------------------------------------------
 
         int rotaFernãoVelosoAlta =
                 buscarIdRota(rotaDAO, "Fernão Veloso → Alta");
@@ -509,12 +506,10 @@ public class DatabaseSeeder {
         );
 
 
-        /*
-         * ------------------------------------------------------------
-         * ROTA 3
-         * Baixa → Alta
-         * ------------------------------------------------------------
-         */
+        // ------------------------------------------------------------
+        // ROTA 3
+        // Baixa → Alta
+        // ------------------------------------------------------------
 
         int rotaBaixaAlta =
                 buscarIdRota(rotaDAO, "Baixa → Alta");
@@ -600,13 +595,10 @@ public class DatabaseSeeder {
         );
 
 
-        /*
-         * ------------------------------------------------------------
-         * ROTA 4
-         * Baixa → Matibane
-         * ------------------------------------------------------------
-         */
-
+        // ------------------------------------------------------------
+        // ROTA 4
+        // Baixa → Matibane
+        // ------------------------------------------------------------
 
         int rotaBaixaMatibane =
                 buscarIdRota(rotaDAO, "Baixa → Matibane");
@@ -700,16 +692,10 @@ public class DatabaseSeeder {
         );
 
 
-        /*
-         * ------------------------------------------------------------
-         * ROTA 5
-         * Juma → Nacala-a-Velha
-         * ------------------------------------------------------------
-         *
-         * Pela opção A, temos apenas as paragens conhecidas:
-         * Juma e Nacala-a-Velha.
-         * ------------------------------------------------------------
-         */
+        // ------------------------------------------------------------
+        // ROTA 5
+        // Juma → Nacala-a-Velha
+        // ------------------------------------------------------------
 
         int rotaJumaNacalaVelha =
                 buscarIdRota(rotaDAO, "Juma → Nacala-a-Velha");
@@ -738,14 +724,51 @@ public class DatabaseSeeder {
      * ================================================================
      */
 
-    private static void inserirRotaSeNaoExistir(
+    private static void inserirOuAtualizarRota(
             RotaDAO rotaDAO,
             Rota rota
     ) {
 
-        if (buscarIdRota(rotaDAO, rota.getNome()) == -1) {
+        int id = buscarIdRota(rotaDAO, rota.getNome());
+
+        if (id == -1) {
+
             rotaDAO.inserir(rota);
+
+        } else {
+
+            atualizarRota(rotaDAO, id, rota);
         }
+    }
+
+
+    private static void atualizarRota(
+            RotaDAO rotaDAO,
+            int id,
+            Rota rota
+    ) {
+
+        SQLiteDatabase db =
+                rotaDAO.getDatabaseHelper()
+                        .getWritableDatabase();
+
+        android.content.ContentValues values =
+                new android.content.ContentValues();
+
+        values.put("nome", rota.getNome());
+        values.put("origem", rota.getOrigem());
+        values.put("destino", rota.getDestino());
+        values.put("tarifa", rota.getTarifa());
+        values.put("descricao", rota.getDescricao());
+
+        db.update(
+                "rota",
+                values,
+                "id = ?",
+                new String[]{String.valueOf(id)}
+        );
+
+        db.close();
     }
 
 
@@ -771,6 +794,7 @@ public class DatabaseSeeder {
     ) {
 
         if (paragemDAO.buscarPorNome(paragem.getNome()) == null) {
+
             paragemDAO.inserir(paragem);
         }
     }
@@ -788,13 +812,18 @@ public class DatabaseSeeder {
             return;
         }
 
-        Paragem paragem = paragemDAO.buscarPorNome(nomeParagem);
+        Paragem paragem =
+                paragemDAO.buscarPorNome(nomeParagem);
 
         if (paragem == null) {
             return;
         }
 
-        if (!relacaoExiste(rotaParagemDAO, rotaId, paragem.getId())) {
+        if (!relacaoExiste(
+                rotaParagemDAO,
+                rotaId,
+                paragem.getId()
+        )) {
 
             rotaParagemDAO.inserir(
                     rotaId,
