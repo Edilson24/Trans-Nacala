@@ -29,9 +29,24 @@
             android:name=".DetalhesRotaActivity"
             android:exported="false" />
 
-        <!-- Tela de Rotas -->
         <activity
             android:name=".RotasActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".GerenciarRotasActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".GerenciarParagensActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".VincularParagensActivity"
             android:exported="false" />
 
     </application>

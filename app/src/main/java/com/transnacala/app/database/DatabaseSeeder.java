@@ -17,6 +17,17 @@ public class DatabaseSeeder {
 
         /*
          * ============================================================
+         * VERIFICAÇÃO DE SEGURANÇA (FIRST-RUN ONLY)
+         * ============================================================
+         * Se já existirem rotas no banco, encerra sem alterar nada.
+         */
+
+        if (rotaDAO.listarTodas().size() > 0) {
+            return;
+        }
+
+        /*
+         * ============================================================
          * 1. GARANTIR / ATUALIZAR AS ROTAS
          * ============================================================
          */
@@ -787,7 +798,6 @@ public class DatabaseSeeder {
         return -1;
     }
 
-
     private static void inserirParagemSeNaoExistir(
             ParagemDAO paragemDAO,
             Paragem paragem
@@ -798,7 +808,6 @@ public class DatabaseSeeder {
             paragemDAO.inserir(paragem);
         }
     }
-
 
     private static void adicionarParagemNaRota(
             RotaParagemDAO rotaParagemDAO,
@@ -832,7 +841,6 @@ public class DatabaseSeeder {
             );
         }
     }
-
 
     private static boolean relacaoExiste(
             RotaParagemDAO rotaParagemDAO,

@@ -18,6 +18,7 @@ public class RotaDAO {
         databaseHelper = new DatabaseHelper(context);
     }
 
+
     public long inserir(Rota rota) {
 
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
@@ -99,5 +100,28 @@ public class RotaDAO {
 
     public DatabaseHelper getDatabaseHelper() {
         return databaseHelper;
+    }
+
+    // Atualizar uma rota existente
+    public int atualizar(Rota rota) {
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("nome", rota.getNome());
+        values.put("origem", rota.getOrigem());
+        values.put("destino", rota.getDestino());
+        values.put("tarifa", rota.getTarifa());
+        values.put("descricao", rota.getDescricao());
+
+        int rowsAffected = db.update("rota", values, "id = ?", new String[]{String.valueOf(rota.getId())});
+        db.close();
+        return rowsAffected;
+    }
+
+    // Eliminar uma rota por ID
+    public int eliminar(int id) {
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        int rowsDeleted = db.delete("rota", "id = ?", new String[]{String.valueOf(id)});
+        db.close();
+        return rowsDeleted;
     }
 }

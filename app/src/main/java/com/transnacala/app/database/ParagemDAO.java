@@ -131,4 +131,23 @@ public class ParagemDAO {
 
         return paragens;
     }
+
+    public int atualizar(Paragem paragem) {
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("nome", paragem.getNome());
+        values.put("latitude", paragem.getLatitude());
+        values.put("longitude", paragem.getLongitude());
+
+        int rowsAffected = db.update("paragem", values, "id = ?", new String[]{String.valueOf(paragem.getId())});
+        db.close();
+        return rowsAffected;
+    }
+
+    public int eliminar(int id) {
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        int rowsDeleted = db.delete("paragem", "id = ?", new String[]{String.valueOf(id)});
+        db.close();
+        return rowsDeleted;
+    }
 }

@@ -96,4 +96,45 @@ public class RotaParagemDAO {
 
         return paragens;
     }
+
+    // Vincular uma paragem a uma rota com uma ordem específica
+    public long associarParagem(int rotaId, int paragemId, int ordem) {
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("rota_id", rotaId);
+        values.put("paragem_id", paragemId);
+        values.put("ordem", ordem);
+
+        long id = db.insert("rota_paragem", null, values);
+        db.close();
+        return id;
+    }
+
+    // Remover uma vinculação específica
+    public int removerParagemDaRota(int rotaId, int paragemId) {
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        int rows = db.delete(
+                "rota_paragem",
+                "rota_id = ? AND paragem_id = ?",
+                new String[]{String.valueOf(rotaId), String.valueOf(paragemId)}
+        );
+        db.close();
+        return rows;
+    }
+
+    // Atualizar a ordem de uma paragem na rota
+    public int atualizarOrdem(int rotaId, int paragemId, int novaOrdem) {
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("ordem", novaOrdem);
+
+        int rows = db.update(
+                "rota_paragem",
+                values,
+                "rota_id = ? AND paragem_id = ?",
+                new String[]{String.valueOf(rotaId), String.valueOf(paragemId)}
+        );
+        db.close();
+        return rows;
+    }
 }
