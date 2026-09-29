@@ -6,15 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.transnacala.app.adapter.RotasAdminAdapter;
 import com.transnacala.app.database.RotaDAO;
 import com.transnacala.app.model.Rota;
-import com.transnacala.app.adapter.RotasAdminAdapter;
 
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class GerenciarRotasActivity extends AppCompatActivity {
 
         rotaDAO = new RotaDAO(this);
         recyclerView = findViewById(R.id.rvRotasAdmin);
-        FloatingActionButton fabAdicionar = findViewById(R.id.fabAdicionarRota);
+        View fabAdicionar = findViewById(R.id.fabAdicionarRota);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         carregarRotas();
@@ -54,7 +53,6 @@ public class GerenciarRotasActivity extends AppCompatActivity {
 
             @Override
             public void onGerirParagens(Rota rota) {
-                // AQUI FICA O TRECHO DE CÓDIGO
                 Intent intent = new Intent(GerenciarRotasActivity.this, VincularParagensActivity.class);
                 intent.putExtra("ROTA_ID", rota.getId());
                 intent.putExtra("ROTA_NOME", rota.getNome());
@@ -65,7 +63,6 @@ public class GerenciarRotasActivity extends AppCompatActivity {
     }
 
     private void abrirDialogFormulario(Rota rotaExistente) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_formulario_rota, null);
 
         EditText etNome = view.findViewById(R.id.etNomeRota);
@@ -84,7 +81,8 @@ public class GerenciarRotasActivity extends AppCompatActivity {
             etDescricao.setText(rotaExistente.getDescricao());
         }
 
-        builder.setTitle(isEdicao ? "Editar Rota" : "Nova Rota")
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(isEdicao ? "Editar Rota" : "Nova Rota")
                 .setView(view)
                 .setPositiveButton("Salvar", (dialog, which) -> {
                     String nome = etNome.getText().toString().trim();
@@ -98,7 +96,13 @@ public class GerenciarRotasActivity extends AppCompatActivity {
                         return;
                     }
 
-                    double tarifa = Double.parseDouble(tarifaStr);
+                    double tarifa;
+                    try {
+                        tarifa = Double.parseDouble(tarifaStr);
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(this, "Tarifa inválida!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
                     if (isEdicao) {
                         rotaExistente.setNome(nome);
@@ -117,20 +121,19 @@ public class GerenciarRotasActivity extends AppCompatActivity {
                     carregarRotas();
                 })
                 .setNegativeButton("Cancelar", null)
-                .create()
                 .show();
     }
 
     private void confirmarEliminacao(Rota rota) {
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle("Eliminar Rota")
-                .setMessage("Deseja realmente eliminar a rota " + rota.getNome() + "?")
-                .setPositiveButton("Sim", (dialog, which) -> {
+                .setMessage("Deseja realmente eliminar a rota \"" + rota.getNome() + "\"?")
+                .setPositiveButton("Eliminar", (dialog, which) -> {
                     rotaDAO.eliminar(rota.getId());
-                    Toast.makeText(this, "Rota eliminada!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Rota eliminada com sucesso!", Toast.LENGTH_SHORT).show();
                     carregarRotas();
                 })
-                .setNegativeButton("Não", null)
+                .setNegativeButton("Cancelar", null)
                 .show();
     }
 }

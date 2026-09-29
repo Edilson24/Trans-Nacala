@@ -3,19 +3,21 @@ package com.transnacala.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.transnacala.app.database.DatabaseSeeder;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btnRotas;
-    private Button btnAdmin;
+    private View btnRotas;
+    private View btnAdmin;
 
     // Palavra-passe definida para acesso do administrador
     private static final String ADMIN_PIN = "1234";
@@ -42,27 +44,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void solicitarAcessoAdmin() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Acesso Restrito");
-        builder.setMessage("Digite a palavra-passe do Administrador:");
+        FrameLayout container = new FrameLayout(this);
+        int paddingPx = (int) (20 * getResources().getDisplayMetrics().density);
+        container.setPadding(paddingPx, paddingPx / 2, paddingPx, 0);
 
-        // Campo para digitar o PIN
-        final EditText input = new EditText(this);
+        TextInputLayout inputLayout = new TextInputLayout(this, null, com.google.android.material.R.style.Widget_Material3_TextInputLayout_OutlinedBox);
+        inputLayout.setHint("Palavra-passe do Administrador");
+
+        TextInputEditText input = new TextInputEditText(inputLayout.getContext());
         input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-        builder.setView(input);
+        inputLayout.addView(input);
+        container.addView(inputLayout);
 
-        builder.setPositiveButton("Entrar", (dialog, which) -> {
-            String pinDigitado = input.getText().toString().trim();
-            if (ADMIN_PIN.equals(pinDigitado)) {
-                Intent intent = new Intent(MainActivity.this, AdminActivity.class);
-                startActivity(intent);
-            } else {
-                Toast.makeText(MainActivity.this, "Palavra-passe incorreta!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
-
-        builder.show();
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Acesso Restrito")
+                .setMessage("Digite a palavra-passe para aceder ao painel de administração:")
+                .setView(container)
+                .setPositiveButton("Entrar", (dialog, which) -> {
+                    String pinDigitado = input.getText() != null ? input.getText().toString().trim() : "";
+                    if (ADMIN_PIN.equals(pinDigitado)) {
+                        Intent intent = new Intent(MainActivity.this, AdminActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(MainActivity.this, "Palavra-passe incorreta!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel())
+                .show();
     }
 }

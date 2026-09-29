@@ -5,12 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.transnacala.app.adapter.ParagensAdminAdapter;
 import com.transnacala.app.database.ParagemDAO;
 import com.transnacala.app.model.Paragem;
@@ -30,7 +29,7 @@ public class GerenciarParagensActivity extends AppCompatActivity {
 
         paragemDAO = new ParagemDAO(this);
         recyclerView = findViewById(R.id.rvParagensAdmin);
-        FloatingActionButton fabAdicionar = findViewById(R.id.fabAdicionarParagem);
+        View fabAdicionar = findViewById(R.id.fabAdicionarParagem);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         carregarParagens();
@@ -55,7 +54,6 @@ public class GerenciarParagensActivity extends AppCompatActivity {
     }
 
     private void abrirDialogFormulario(Paragem paragemExistente) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_formulario_paragem, null);
 
         EditText etNome = view.findViewById(R.id.etNomeParagem);
@@ -70,7 +68,8 @@ public class GerenciarParagensActivity extends AppCompatActivity {
             etLongitude.setText(String.valueOf(paragemExistente.getLongitude()));
         }
 
-        builder.setTitle(isEdicao ? "Editar Paragem" : "Nova Paragem")
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(isEdicao ? "Editar Paragem" : "Nova Paragem")
                 .setView(view)
                 .setPositiveButton("Salvar", (dialog, which) -> {
                     String nome = etNome.getText().toString().trim();
@@ -82,38 +81,44 @@ public class GerenciarParagensActivity extends AppCompatActivity {
                         return;
                     }
 
-                    double latitude = Double.parseDouble(latStr);
-                    double longitude = Double.parseDouble(longStr);
+                    double latitude;
+                    double longitude;
+                    try {
+                        latitude = Double.parseDouble(latStr);
+                        longitude = Double.parseDouble(longStr);
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(this, "Coordenadas inválidas!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
                     if (isEdicao) {
                         paragemExistente.setNome(nome);
                         paragemExistente.setLatitude(latitude);
                         paragemExistente.setLongitude(longitude);
                         paragemDAO.atualizar(paragemExistente);
-                        Toast.makeText(this, "Paragem atualizada!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Paragem atualizada com sucesso!", Toast.LENGTH_SHORT).show();
                     } else {
                         Paragem novaParagem = new Paragem(nome, latitude, longitude);
                         paragemDAO.inserir(novaParagem);
-                        Toast.makeText(this, "Paragem cadastrada!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Paragem cadastrada com sucesso!", Toast.LENGTH_SHORT).show();
                     }
 
                     carregarParagens();
                 })
                 .setNegativeButton("Cancelar", null)
-                .create()
                 .show();
     }
 
     private void confirmarEliminacao(Paragem paragem) {
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle("Eliminar Paragem")
-                .setMessage("Deseja realmente eliminar a paragem " + paragem.getNome() + "?")
-                .setPositiveButton("Sim", (dialog, which) -> {
+                .setMessage("Deseja realmente eliminar a paragem \"" + paragem.getNome() + "\"?")
+                .setPositiveButton("Eliminar", (dialog, which) -> {
                     paragemDAO.eliminar(paragem.getId());
-                    Toast.makeText(this, "Paragem eliminada!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Paragem eliminada com sucesso!", Toast.LENGTH_SHORT).show();
                     carregarParagens();
                 })
-                .setNegativeButton("Não", null)
+                .setNegativeButton("Cancelar", null)
                 .show();
     }
 }
